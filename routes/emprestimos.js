@@ -37,7 +37,13 @@ router.put('/:id/devolver', async (req, res) => {
         if (!emprestimo) return res.status(404).json({ erro: "Empréstimo não encontrado"});
 
         await emprestimo.update({status: "Devolvido", data_devolucao: new Date() });
-        
+
+        const livro = await Livro.findByPk(emprestimo.id_livro);
+        await livro.update({ disponibilidade: true});
+
+        res.json({ mensagem: "Livro Devolvido!"});
+    } catch (error) {
+        res.status(500).json({ erro: error.message });
     }
 });
 
