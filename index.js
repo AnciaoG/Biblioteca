@@ -1,18 +1,25 @@
 const express = require('express');
 const cors = require('cors');
 const sequelize = require('./config/banco.js');
-
-const UsuarioRoutes = require('./routes/usuarios.js')
-const LivroRoutes = require('./routes/livros.js')
-const EmprestimoRoutes = require('./routes/emprestimos.js')
+const path = require('path'); 
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
-app.use("/Usuarios", UsuarioRoutes);
+app.use(express.static(path.join(__dirname, 'views')));
+
+
+const LivroRoutes = require('./routes/livros.js')
+const EmprestimoRoutes = require('./routes/emprestimos.js')
+
 app.use("/Livros", LivroRoutes);
 app.use("/Emprestimo", EmprestimoRoutes);
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'index.html'));
+  });
 
 sequelize.sync().then(() => console.log("Banco conectado!"));
 

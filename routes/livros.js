@@ -30,7 +30,7 @@ router.put('/:id', async (req, res) => {
         await livro.update({titulo, autor, ano, disponibilidade });
         res.json(livro);
     } catch (error){
-        res.status(500).json({erro: error.message })
+        res.status(500).json({erro: error.message });
     }
 });
 

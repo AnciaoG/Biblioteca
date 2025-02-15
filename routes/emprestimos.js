@@ -1,7 +1,7 @@
 const express = require('express');
 const Emprestimo = require("../models/Emprestimo.js");
-const Livro = require("../models/Livro.js")
-const Usuario = require("../models/Usuario.js")
+const Livro = require("../models/Livro.js");
+const Usuario = require("../models/Usuario.js");
 
 const router = express.Router();
 
