@@ -1,4 +1,5 @@
 const express = require('express');
+const { Op } = require('sequelize');
 const Livro = require('../models/Livro.js');
 
 const router = express.Router();
@@ -14,17 +15,35 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Buscar todos os livros (listar)
-router.get('/', async (req, res) => {
+// Buscar livro por ID, título ou autor
+router.get('/buscar', async (req, res) => {
     try {
-        // Obtém todos os livros, incluindo todos os detalhes
-        const livros = await Livro.findAll();
-        
-        // Verifica se existem livros
-        if (livros.length === 0) {
-            return res.status(404).json({ erro: 'Nenhum livro encontrado' });
+        const { termo } = req.query;
+
+        if (!termo) {
+            return res.status(400).json({ erro: 'Nenhum termo de busca fornecido' });
         }
-        
+
+        // Verifica se o termo é um número válido para buscar por ID
+        const whereClause = {
+            [Op.or]: []
+        };
+
+        if (!isNaN(termo)) {
+            whereClause[Op.or].push({ id: Number(termo) });
+        }
+
+        whereClause[Op.or].push(
+            { titulo: { [Op.like]: `%${termo}%` } },
+            { autor: { [Op.like]: `%${termo}%` } }
+        );
+
+        const livros = await Livro.findAll({ where: whereClause });
+
+        if (livros.length === 0) {
+            return res.status(404).json({ erro: 'Livro não encontrado' });
+        }
+
         res.json(livros);
     } catch (error) {
         res.status(500).json({ erro: error.message });
@@ -63,6 +82,22 @@ router.get('/listar', async (req, res) => {
         }
 
         res.json(livros);
+    } catch (error) {
+        res.status(500).json({ erro: error.message });
+    }
+});
+
+// Excluir um livro pelo ID
+router.delete('/:id', async (req, res) => {
+    try {
+        const livro = await Livro.findByPk(req.params.id);
+
+        if (!livro) {
+            return res.status(404).json({ erro: 'Livro não encontrado' });
+        }
+
+        await livro.destroy();
+        res.json({ mensagem: 'Livro excluído com sucesso' });
     } catch (error) {
         res.status(500).json({ erro: error.message });
     }
