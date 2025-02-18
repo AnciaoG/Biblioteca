@@ -8,18 +8,24 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h2 class="mb-4"> Gerenciamento de Empréstimos</h2>
+        <h2 class="mb-4">Gerenciamento de Empréstimos</h2>
 
         <!-- Formulário para Solicitação de Empréstimo -->
         <form id="formEmprestimo" class="mb-4">
             <div class="row">
                 <div class="col-md-4">
+                    <label for="idUsuario" class="form-label">ID do Usuário</label>
                     <input type="number" id="idUsuario" class="form-control" placeholder="ID do Usuário" required>
                 </div>
                 <div class="col-md-4">
+                    <label for="idLivro" class="form-label">ID do Livro</label>
                     <input type="number" id="idLivro" class="form-control" placeholder="ID do Livro" required>
                 </div>
                 <div class="col-md-2">
+                    <label for="dataDevolucao" class="form-label">Data de Devolução</label>
+                    <input type="date" id="dataDevolucao" class="form-control" required>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-100">Solicitar</button>
                 </div>
             </div>
@@ -44,6 +50,54 @@
         </table>
     </div>
 
-    <script src="../public/js/emprestimo.js"></script>
+    <script>
+        const formEmprestimo = document.getElementById('formEmprestimo');
+        const listaEmprestimos = document.getElementById('listaEmprestimos');
+
+        // Função para simular o empréstimo
+        formEmprestimo.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const idUsuario = document.getElementById('idUsuario').value;
+            const idLivro = document.getElementById('idLivro').value;
+            const dataDevolucao = document.getElementById('dataDevolucao').value;
+            const dataEmprestimo = new Date().toLocaleDateString();
+
+            const novoEmprestimo = {
+                id: listaEmprestimos.children.length + 1,
+                usuario: `Usuário ${idUsuario}`,
+                livro: `Livro ${idLivro}`,
+                dataEmprestimo: dataEmprestimo,
+                dataDevolucao: dataDevolucao,
+                status: 'Em andamento'
+            };
+
+            const emprestimoRow = document.createElement('tr');
+            emprestimoRow.innerHTML = `
+                <td>${novoEmprestimo.id}</td>
+                <td>${novoEmprestimo.usuario}</td>
+                <td>${novoEmprestimo.livro}</td>
+                <td>${novoEmprestimo.dataEmprestimo}</td>
+                <td>${novoEmprestimo.dataDevolucao}</td>
+                <td>${novoEmprestimo.status}</td>
+                <td><button class="btn btn-danger btn-sm" onclick="devolverLivro(${novoEmprestimo.id})">Devolver</button></td>
+            `;
+
+            listaEmprestimos.appendChild(emprestimoRow);
+
+            // Limpar o formulário após submissão
+            formEmprestimo.reset();
+        });
+
+        // Função para marcar o livro como devolvido
+        function devolverLivro(id) {
+            const row = document.querySelector(`tr:nth-child(${id})`);
+            const statusCell = row.children[5];
+            statusCell.textContent = 'Devolvido';
+            const devolverButton = row.querySelector('button');
+            devolverButton.setAttribute('disabled', true);
+            devolverButton.textContent = 'Devolvido';
+        }
+    </script>
 </body>
 </html>
