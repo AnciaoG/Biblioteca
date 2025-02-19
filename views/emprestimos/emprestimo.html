@@ -9,29 +9,21 @@
 <body>
     <div class="container mt-5">
         <h2 class="mb-4">Gerenciamento de Empréstimos</h2>
-
-        <!-- Formulário para Solicitação de Empréstimo -->
+        
         <form id="formEmprestimo" class="mb-4">
             <div class="row">
-                <div class="col-md-4">
-                    <label for="idUsuario" class="form-label">ID do Usuário</label>
-                    <input type="number" id="idUsuario" class="form-control" placeholder="ID do Usuário" required>
-                </div>
-                <div class="col-md-4">
-                    <label for="idLivro" class="form-label">ID do Livro</label>
-                    <input type="number" id="idLivro" class="form-control" placeholder="ID do Livro" required>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-success w-100" onclick="window.location.href='../../index.html'">Voltar</button>
                 </div>
                 <div class="col-md-2">
-                    <label for="dataDevolucao" class="form-label">Data de Devolução</label>
-                    <input type="date" id="dataDevolucao" class="form-control" required>
+                    <button type="button" class="btn btn-success w-100" onclick="window.location.href='/cadastradoe.html'">Adicionar</button>
                 </div>
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100">Solicitar</button>
+                <div class="col-md-4">
+                    <button type="button" class="btn btn-success w-100" onclick="window.location.href='buscae.html'">Buscar</button>
                 </div>
             </div>
         </form>
 
-        <!-- Tabela de Empréstimos -->
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -45,59 +37,73 @@
                 </tr>
             </thead>
             <tbody id="listaEmprestimos">
-                <!-- Dados inseridos dinamicamente via JavaScript -->
+                <!-- Inserindo via JavaScript -->
             </tbody>
         </table>
     </div>
 
     <script>
-        const formEmprestimo = document.getElementById('formEmprestimo');
-        const listaEmprestimos = document.getElementById('listaEmprestimos');
-
-        // Função para simular o empréstimo
-        formEmprestimo.addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const idUsuario = document.getElementById('idUsuario').value;
-            const idLivro = document.getElementById('idLivro').value;
-            const dataDevolucao = document.getElementById('dataDevolucao').value;
-            const dataEmprestimo = new Date().toLocaleDateString();
-
-            const novoEmprestimo = {
-                id: listaEmprestimos.children.length + 1,
-                usuario: `Usuário ${idUsuario}`,
-                livro: `Livro ${idLivro}`,
-                dataEmprestimo: dataEmprestimo,
-                dataDevolucao: dataDevolucao,
-                status: 'Em andamento'
-            };
-
-            const emprestimoRow = document.createElement('tr');
-            emprestimoRow.innerHTML = `
-                <td>${novoEmprestimo.id}</td>
-                <td>${novoEmprestimo.usuario}</td>
-                <td>${novoEmprestimo.livro}</td>
-                <td>${novoEmprestimo.dataEmprestimo}</td>
-                <td>${novoEmprestimo.dataDevolucao}</td>
-                <td>${novoEmprestimo.status}</td>
-                <td><button class="btn btn-danger btn-sm" onclick="devolverLivro(${novoEmprestimo.id})">Devolver</button></td>
-            `;
-
-            listaEmprestimos.appendChild(emprestimoRow);
-
-            // Limpar o formulário após submissão
-            formEmprestimo.reset();
+        document.addEventListener('DOMContentLoaded', function() {
+            async function listarEmprestimos() {
+                try {
+                    const response = await fetch('http://localhost:2200/Emprestimos/listar');
+    
+                    if (!response.ok) {
+                        throw new Error('Erro na resposta da API: ' + response.status + ' - ' + response.statusText);
+                    }
+    
+                    const emprestimos = await response.json();
+    
+                    if (emprestimos.length === 0) {
+                        document.getElementById('listaEmprestimos').innerHTML = '<tr><td colspan="7">Nenhum empréstimo encontrado</td></tr>';
+                    } else {
+                        let emprestimosHTML = '';
+                        emprestimos.forEach(emprestimo => {
+                            emprestimosHTML += `
+                                <tr id="emprestimo-${emprestimo.id}">
+                                    <td>${emprestimo.id}</td>
+                                    <td>${emprestimo.usuario}</td>
+                                    <td>${emprestimo.livro}</td>
+                                    <td>${emprestimo.dataEmprestimo}</td>
+                                    <td>${emprestimo.dataDevolucao}</td>
+                                    <td id="status-${emprestimo.id}">${emprestimo.status}</td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm" onclick="devolverLivro(${emprestimo.id})">Devolver</button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        document.getElementById('listaEmprestimos').innerHTML = emprestimosHTML;
+                    }
+                } catch (error) {
+                    console.error('Erro ao listar empréstimos:', error);
+                    document.getElementById('listaEmprestimos').innerHTML = `<tr><td colspan="7">Erro ao carregar empréstimos: ${error.message}</td></tr>`;
+                }
+            }
+    
+            async function devolverLivro(id) {
+                if (confirm('Tem certeza que deseja marcar este empréstimo como devolvido?')) {
+                    try {
+                        const response = await fetch(`http://localhost:2200/Emprestimos/${id}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ status: 'Devolvido' })
+                        });
+    
+                        if (!response.ok) {
+                            throw new Error('Erro ao atualizar o status do empréstimo');
+                        }
+    
+                        alert('Empréstimo marcado como devolvido!');
+                        document.getElementById(`status-${id}`).innerText = 'Devolvido';
+                    } catch (error) {
+                        alert('Erro ao atualizar o status: ' + error.message);
+                    }
+                }
+            }
+    
+            listarEmprestimos();
         });
-
-        // Função para marcar o livro como devolvido
-        function devolverLivro(id) {
-            const row = document.querySelector(`tr:nth-child(${id})`);
-            const statusCell = row.children[5];
-            statusCell.textContent = 'Devolvido';
-            const devolverButton = row.querySelector('button');
-            devolverButton.setAttribute('disabled', true);
-            devolverButton.textContent = 'Devolvido';
-        }
     </script>
 </body>
 </html>
