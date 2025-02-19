@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro</title>
-    <link rel="stylesheet" href="/BB/css/registro.css">
+    <link rel="stylesheet" href="/public/css/registro.css">
 </head>
 <body>
     <div class="container">
         <div class="image-container">
-            <img src="/BB/img/book.jpeg" alt="Registro">
+            <img src="/img/book.jpeg" alt="Registro">
         </div>
         <div class="register-container">
             <h1>Registrar</h1>
@@ -41,7 +41,7 @@
             let userType = "1"; // Padrão: Usuário comum
     
             try {
-                const response = await fetch("http://localhost:3000/api/checkUsers");
+                const response = await fetch("http://localhost:2200/api/checkUsers");
                 const data = await response.json();
     
                 if (data.totalUsers === 0) {
@@ -64,7 +64,7 @@
             console.log("Dados do usuário:", userData); // Para teste
     
             // Envia os dados para o backend
-            fetch("http://localhost:3000/api/register", {
+            fetch("http://localhost:2200/api/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -74,7 +74,7 @@
             .then(response => response.json())
             .then(data => {
                 alert("Registro bem-sucedido! Código de usuário: " + uniqueCode);
-                window.location.href = "../Viws/usuario.html"; // Redireciona após registro
+                window.location.href = "/views/Gerenciamento/usuario.html"; // Redireciona após registro
             })
             .catch(error => console.error("Erro no registro:", error));
         });

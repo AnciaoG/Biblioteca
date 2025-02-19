@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meus Livros</title>
-    <link rel="stylesheet" href="/BB/css/usuario.css">
-    <script defer src="/BB/modules/meus_livros.js"></script>
+    <link rel="stylesheet" href="/public/css/usuario.css">
+    <script defer src="/models/MeusLivros.js"></script>
 </head>
 <body>
     <div class="sidebar">
         <h2>Biblioteca</h2>
         <ul>
-            <li><a href="../PainelPrincipal/usuario.html"> Início</a></li>
+            <li><a href="/views/PainelPrincipal/usuario.html"> Início</a></li>
             <li class="active"> Meus Livros</li>
             <li> Favoritos</li>
             <li> Configurações</li>
@@ -31,7 +31,7 @@
     <script>
         document.getElementById("logout").addEventListener("click", function () {
             fetch("/logout", { method: "POST" })
-                .then(() => window.location.href = "/BB/Viws/TelaInicial/telaInicial.html")
+                .then(() => window.location.href = "/views/TelaInicial/telainicial.html")
                 .catch(error => console.error("Erro ao sair:", error));
         });
     </script>
