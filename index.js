@@ -18,7 +18,7 @@ app.use("/Livros", LivroRoutes);
 app.use("/Emprestimo", EmprestimoRoutes);
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'index.html'));
+    res.sendFile(path.join(__dirname, 'views', 'TelaInicial', 'telainicial.html'));
   });
 
 sequelize.sync().then(() => console.log("Banco conectado!"));
